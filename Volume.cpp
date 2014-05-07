@@ -124,6 +124,7 @@ Volume::Volume(VolumeManager *vm, const fstab_rec* rec, int flags) {
     mUserLabel = NULL;
     mState = Volume::State_Init;
     mFlags = flags;
+    mOpts = (rec->fs_options ? strdup(rec->fs_options) : NULL);
     mCurrentlyMountedKdev = -1;
     mPartIdx = rec->partnum;
     mRetryMount = false;
@@ -134,6 +135,7 @@ Volume::~Volume() {
     free(mLabel);
     free(mUuid);
     free(mUserLabel);
+    free(mOpts);
 }
 
 void Volume::setDebug(bool enable) {
@@ -322,14 +324,18 @@ int Volume::formatVol(bool wipe, const char* fstype) {
         fstype2 = strdup("vfat");
     }
 
-    if (strcmp(fstype2, "f2fs") == 0) {
-        ret = F2FS::format(devicePath);
+   
     } else if (strcmp(fstype2, "exfat") == 0) {
+
+
+    if (strcmp(fstype2, "exfat") == 0) {
         ret = Exfat::format(devicePath);
     } else if (strcmp(fstype2, "ext4") == 0) {
         ret = Ext4::format(devicePath, NULL);
     } else if (strcmp(fstype2, "ntfs") == 0) {
         ret = Ntfs::format(devicePath, wipe);
+    } else if (strcmp(fstype2, "f2fs") == 0) {
+        ret = F2FS::format(devicePath);
     } else {
         ret = Fat::format(devicePath, 0, wipe);
     }
@@ -515,7 +521,7 @@ int Volume::mountVol() {
                     return -1;
                 }
 
-                if (Ext4::doMount(devicePath, getMountpoint(), false, false, false, true)) {
+                if (Ext4::doMount(devicePath, getMountpoint(), false, false, false, true, mOpts)) {
                     SLOGE("%s failed to mount via EXT4 (%s)\n", devicePath, strerror(errno));
                     continue;
                 }
