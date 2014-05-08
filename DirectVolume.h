@@ -22,11 +22,7 @@
 #include "Volume.h"
 
 #ifndef VOLD_MAX_PARTITIONS
-#define VOLD_MAX_PARTITIONS 34
-#endif
-
-#if defined(VOLD_DISC_HAS_MULTIPLE_MAJORS) && !defined(VOLD_INTERNAL_VOLUME)
-#define VOLD_INTERNAL_VOLUME "sdcard0"
+#define VOLD_MAX_PARTITIONS 32
 #endif
 
 #if defined(VOLD_DISC_HAS_MULTIPLE_MAJORS) && !defined(VOLD_INTERNAL_VOLUME)
